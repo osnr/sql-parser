@@ -291,8 +291,11 @@ grammar =
   ]
 
   Literal: [
+    o 'String',                                          -> new LiteralValue($1)
     o 'LITERAL',                                          -> new LiteralValue($1)
+    o 'Literal DOT String',                              -> new LiteralValue($1, $3)
     o 'Literal DOT LITERAL',                              -> new LiteralValue($1, $3)
+    o 'Literal DOT STAR',                              -> new LiteralValue($1, $3)
   ]
 
   Function: [
