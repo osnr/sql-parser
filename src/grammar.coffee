@@ -82,7 +82,7 @@ grammar =
 
   Unions: [
     o 'Union',                                            -> [$1]
-    o 'Unions Union',                                     -> $1.concat($3)
+    o 'Unions Union',                                     -> $1.concat($2)
   ]
 
   Union: [
