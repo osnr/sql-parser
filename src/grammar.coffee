@@ -195,6 +195,61 @@ grammar =
     o 'CaseStatement'
     o 'WindowExpression'
     o 'Value'
+    o 'Query'
+  ]
+
+  SubSelectOp: [
+    o 'IN'
+    o 'NOT IN', -> $1+' '+$2
+    o 'ANY'
+    o 'ALL'
+    o 'SOME'
+  ]
+
+  WindowExpression: [
+    o 'Expression OVER LEFT_PAREN RIGHT_PAREN', -> new Window($1, null)
+    o 'Expression OVER LEFT_PAREN FrameExpressions RIGHT_PAREN', -> new Window($1, $4)
+  ]
+
+  FrameExpressions: [
+    o 'FrameExpression', -> [$1]
+    o 'FrameExpressions FrameExpression', -> $1.concat($2)
+  ]
+
+  FrameExpression: [
+    o 'PARTITION BY Expressions', -> new Partition($3)
+    o 'OrderClause'
+    o 'FrameClause'
+  ]
+
+  FrameClause: [
+    o 'FRAME_OP FrameBound', -> new Frame($1, $2)
+    o 'FRAME_OP BETWEEN FrameBound AND FrameBound', -> new Frame($1, $3, $5)
+  ]
+
+  FrameBound: [
+    o 'Value PRECEDING', -> new FrameBound($1, $2)
+    o 'Value FOLLOWING', -> new FrameBound($1, $2)
+    o 'FRAME_BOUND', -> new FrameBound($1)
+  ]
+
+  CaseStatement: [
+    o 'CASE WhenStatements END',                       -> new Case(null, $2)
+    o 'CASE Expression WhenStatements END',                       -> new Case($2, $3)
+  ]
+
+  WhenStatements: [
+    o 'WhenStatement',                                      -> [$1]
+    o 'WhenStatements WhenStatement',                       -> $1.concat($2)
+    o 'WhenStatements ElseStatement',                       -> $1.concat($2)
+  ]
+
+  WhenStatement: [
+    o 'WHEN Expression THEN Expression',                       -> new When($2, $4)
+  ]
+
+  ElseStatement: [
+    o 'ELSE Expression',                                       -> new Else($2)
   ]
 
   SubSelectExpression: [
