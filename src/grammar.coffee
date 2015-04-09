@@ -309,12 +309,14 @@ grammar =
 
   AggregateArgumentList: [
     o 'ArgumentList',                                    -> new ArgumentListValue($1)
-    o 'DISTINCT ArgumentList',                           -> new ArgumentListValue($2, true)
+    o 'DISTINCT ArgumentList',                           -> new ArgumentListValue($2, 'DISTINCT')
+    o 'ALL ArgumentList',                                -> new ArgumentListValue($2, 'ALL')
   ]
 
   ArgumentList: [
+    o 'STAR',                                            -> [$1]
     o 'Expression',                                       -> [$1]
-    o 'ArgumentList SEPARATOR Value',                     -> $1.concat($3)
+    o 'ArgumentList SEPARATOR Expression',                     -> $1.concat($3)
   ]
 
   Fields: [
