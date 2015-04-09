@@ -178,9 +178,13 @@ grammar =
     o 'Expression MATH Expression',                       -> new Op($2, $1, $3)
     o 'Expression MATH_MULTI Expression',                 -> new Op($2, $1, $3)
     o 'Expression OPERATOR Expression',                   -> new Op($2, $1, $3)
-    o 'Expression CONDITIONAL Expression',                -> new Op($2, $1, $3)
-    o 'Value SUB_SELECT_OP LEFT_PAREN List RIGHT_PAREN',  -> new Op($2, $1, $4)
-    o 'Value SUB_SELECT_OP SubSelectExpression',          -> new Op($2, $1, $3)
+    o 'Expression AND Expression',                        -> new Op($2, $1, $3)
+    o 'Expression OR Expression',                         -> new Op($2, $1, $3)
+    o 'Expression PIPES Expression',                      -> new Op($2, $1, $3)
+    o 'Expression BETWEEN Expression AND Expression',                   -> new Between($1, $3, $5)
+    o 'Value SubSelectOp LEFT_PAREN List RIGHT_PAREN',  -> new Op($2, $1, $4)
+    o 'Value SubSelectOp SubSelectExpression',          -> new Op($2, $1, $3)
+    o 'Value SubSelectOp Expression',          -> new Op($2, $1, $3)
     o 'SUB_SELECT_UNARY_OP SubSelectExpression',          -> new UnaryOp($1, $2)
     o 'Value'
   ]
