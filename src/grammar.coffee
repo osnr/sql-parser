@@ -258,12 +258,15 @@ grammar =
 
   Value: [
     o 'Literal'
+    o 'DATE Value', -> new DateValue($2)
+    o 'TIMESTAMP Value', -> new Timestamp($2)
+    o 'INTERVAL Value', -> new Interval($2)
     o 'Number'
     o 'String'
-    o 'Function'
     o 'UserFunction'
     o 'Boolean'
     o 'Parameter'
+    o 'Value COLON COLON Literal', -> new Cast($1, $4, true)
   ]
 
   List: [
