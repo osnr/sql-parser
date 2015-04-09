@@ -13,11 +13,25 @@ grammar =
 
   Root: [
     o 'Query EOF'
+    o "WithQuery EOF"
   ]
 
   Query: [
     o "SelectQuery"
     o "SelectQuery Unions",                                -> $1.unions = $2; $1
+  ]
+
+  WithQuery: [
+    o "WITH NamedQueries Query",                     -> new WithQuery($2, $3)
+  ]
+
+  NamedQueries: [
+    o "NamedQuery",                                         -> [$1]
+    o "NamedQueries SEPARATOR NamedQuery",                  -> $1.concat($3)
+  ]
+
+  NamedQuery: [
+    o "Literal AS LEFT_PAREN Query RIGHT_PAREN",    -> new NamedQuery($1, $4)
   ]
 
   SelectQuery: [
