@@ -56,10 +56,16 @@ grammar =
   ]
 
   SelectClause: [
-    o 'SELECT Fields FROM Table',                         -> new Select($2, $4, false)
-    o 'SELECT DISTINCT Fields FROM Table',                -> new Select($3, $5, true)
+    o 'SELECT Fields',                                    -> new Select($2, null, false)
+    o 'SELECT Fields FROM Tables',                        -> new Select($2, $4, false)
+    o 'SELECT DISTINCT Fields FROM Tables',                -> new Select($3, $5, true)
     o 'SELECT Fields FROM Table Joins',                   -> new Select($2, $4, false, $5)
     o 'SELECT DISTINCT Fields FROM Table Joins',          -> new Select($3, $5, true, $6)
+  ]
+
+  Tables: [
+    o 'Table',                                          -> [$1]
+    o 'Tables SEPARATOR Table',                         -> $1.concat($3)
   ]
 
   Table: [
