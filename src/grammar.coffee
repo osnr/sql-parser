@@ -96,13 +96,21 @@ grammar =
   ]
 
   Join: [
-    o 'JOIN Table ON Expression',                         -> new Join($2, $4)
-    o 'LEFT JOIN Table ON Expression',                    -> new Join($3, $5, 'LEFT')
-    o 'RIGHT JOIN Table ON Expression',                   -> new Join($3, $5, 'RIGHT')
-    o 'LEFT INNER JOIN Table ON Expression',              -> new Join($4, $6, 'LEFT', 'INNER')
-    o 'RIGHT INNER JOIN Table ON Expression',             -> new Join($4, $6, 'RIGHT', 'INNER')
-    o 'LEFT OUTER JOIN Table ON Expression',              -> new Join($4, $6, 'LEFT', 'OUTER')
-    o 'RIGHT OUTER JOIN Table ON Expression',             -> new Join($4, $6, 'RIGHT', 'OUTER')
+    o 'JOIN Table JoinPredicate',                         -> new Join($2, $3)
+    o 'INNER JOIN Table JoinPredicate',                   -> new Join($2, $4)
+    o 'LEFT JOIN Table JoinPredicate',                    -> new Join($3, $4, 'LEFT')
+    o 'RIGHT JOIN Table JoinPredicate',                   -> new Join($3, $4, 'RIGHT')
+    o 'LEFT INNER JOIN Table JoinPredicate',              -> new Join($4, $5, 'LEFT', 'INNER')
+    o 'RIGHT INNER JOIN Table JoinPredicate',             -> new Join($4, $5, 'RIGHT', 'INNER')
+    o 'LEFT OUTER JOIN Table JoinPredicate',              -> new Join($4, $5, 'LEFT', 'OUTER')
+    o 'RIGHT OUTER JOIN Table JoinPredicate',             -> new Join($4, $5, 'RIGHT', 'OUTER')
+    o 'FULL OUTER JOIN Table JoinPredicate',              -> new Join($4, $5, 'FULL', 'OUTER')
+    o 'FULL JOIN Table JoinPredicate',                    -> new Join($3, $4, 'FULL')
+  ]
+
+  JoinPredicate: [
+    o 'ON Expression',                                 -> $2
+    o 'USING LEFT_PAREN Literal RIGHT_PAREN',           -> new Using($3)
   ]
 
   WhereClause: [
