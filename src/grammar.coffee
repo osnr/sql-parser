@@ -74,6 +74,7 @@ grammar =
     o 'Literal AS Literal',                               -> new Table($1, $3)
     o 'LEFT_PAREN List RIGHT_PAREN',                      -> $2
     o 'LEFT_PAREN Query RIGHT_PAREN',                     -> new SubSelect($2)
+    o 'LEFT_PAREN Query RIGHT_PAREN AS Literal',             -> new SubSelect($2, $5)
     o 'LEFT_PAREN Query RIGHT_PAREN Literal',             -> new SubSelect($2, $4)
     o 'Literal WINDOW WINDOW_FUNCTION LEFT_PAREN Number RIGHT_PAREN',
                                                           -> new Table($1, null, $2, $3, $5)
