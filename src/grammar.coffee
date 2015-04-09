@@ -167,6 +167,11 @@ grammar =
     o 'HAVING Expression',                                -> new Having($2)
   ]
 
+  Expressions: [
+    o 'Expression',                                      -> [$1]
+    o 'Expressions SEPARATOR Expression',               -> $1.concat($3)
+  ]
+
 
   Expression: [
     o 'LEFT_PAREN Expression RIGHT_PAREN',                -> $2
