@@ -186,6 +186,14 @@ grammar =
     o 'Value SubSelectOp SubSelectExpression',          -> new Op($2, $1, $3)
     o 'Value SubSelectOp Expression',          -> new Op($2, $1, $3)
     o 'SUB_SELECT_UNARY_OP SubSelectExpression',          -> new UnaryOp($1, $2)
+    o 'EXTRACT LEFT_PAREN Value FROM Expression RIGHT_PAREN', -> new Extract($3, $5)
+    o 'CAST LEFT_PAREN Expression AS Literal RIGHT_PAREN', -> new Cast($3, $5)
+    o 'CAST LEFT_PAREN Expression AS Literal Literal RIGHT_PAREN', -> new Cast($3, $5+' '+$6)
+    o 'Expression COLON COLON Literal', -> new Cast($1, $4, true)
+    o 'NOT Expression',          -> new UnaryOp($1, $2)
+    o 'Expression WITHIN GROUP LEFT_PAREN OrderClause RIGHT_PAREN',  -> new WithinGroup($1, $5)
+    o 'CaseStatement'
+    o 'WindowExpression'
     o 'Value'
   ]
 
