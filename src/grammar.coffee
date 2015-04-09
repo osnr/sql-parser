@@ -327,6 +327,7 @@ grammar =
   Field: [
     o 'STAR',                                             -> new Star()
     o 'Expression',                                       -> new Field($1)
+    o 'Expression Literal',                               -> new Field($1, $2)
     o 'Expression AS Literal',                            -> new Field($1, $3)
   ]
 
@@ -336,7 +337,8 @@ operators = [
   ['left', 'MATH_MULTI']
   ['left', 'MATH']
   ['left', 'OPERATOR']
-  ['left', 'CONDITIONAL']
+  ['left', 'AND']
+  ['left', 'OR']
 ]
 
 for name, alternatives of grammar
