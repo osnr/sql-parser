@@ -9,6 +9,7 @@ exports.Select = class Select
       @limit = null
     toString: ->
       ret = ["SELECT #{@fields.join(', ')}"]
+      return ret.join("\n") unless @source
       ret.push indent("FROM #{@source}")
       ret.push indent(join.toString()) for join in @joins
       ret.push indent(@where.toString()) if @where
@@ -17,6 +18,108 @@ exports.Select = class Select
       ret.push indent(@limit.toString()) if @limit
       ret.push union.toString() for union in @unions
       ret.join("\n")
+
+exports.Extract = class Extract
+  constructor: (@field, @timestamp) -> null
+  toString: -> "EXTRACT(#{@field} FROM #{@timestamp})"
+
+exports.Timestamp = class Timestamp
+  constructor: (@val) -> null
+  toString: -> "TIMESTAMP #{@val}"
+
+exports.DateValue = class DateValue
+  constructor: (@val) -> null
+  toString: -> "DATE #{@val}"
+
+exports.Interval = class Interval
+  constructor: (@val) -> null
+  toString: -> "INTERVAL #{@val}"
+
+exports.WithQuery = class WithQuery
+  constructor: (@queries, @select) -> null
+  toString: ->
+    ret = ["WITH"]
+    ret.push indent(@queries.join(",\n"))
+    ret.push @select.toString()
+    ret.join("\n")
+
+exports.WithinGroup = class WithinGroup
+  constructor: (@exp, @order) -> null
+  toString: ->
+    "#{@exp} WITHIN GROUP (#{@order})"
+
+exports.NamedQuery = class NamedQuery
+  constructor: (@name, @select) -> null
+  toString: ->
+    ret = ["#{@name} AS ("]
+    ret.push indent(@select.toString())
+    ret.push [")"]
+    ret.join("\n")
+
+exports.Case = class Case
+  constructor: (@pred, @whens) -> null
+  toString: ->
+    ret = ["CASE #{@pred}"]
+    ret.push indent(indent(@whens.join("\n")))
+    ret.push indent("END")
+    ret.join("\n")
+
+exports.When = class When
+  constructor: (@exp, @val) -> null
+  toString: ->
+    "WHEN #{@exp} THEN #{@val}"
+
+exports.Else = class Else
+  constructor: (@exp) -> null
+  toString: ->
+    "ELSE #{@exp}"
+
+exports.Between = class Between
+  constructor: (@exp, @start, @stop) -> null
+  toString: ->
+    "#{@exp} BETWEEN #{@start} AND #{@stop}"
+
+exports.Cast = class Cast
+  constructor: (@exp, @name, @colons) -> null
+  toString: ->
+    if @colons
+      "#{@exp}::#{@name}"
+    else
+      "CAST(#{@exp} AS #{@name})"
+
+exports.Using = class Using
+  constructor: (@val) -> null
+  toString: ->
+    "USING(#{@val})"
+
+exports.Window = class Window
+  constructor: (@exp, @frames) -> null
+  toString: ->
+    if @frames
+      "#{@exp} OVER (#{@frames.join(" ")})"
+    else
+      "#{@exp} OVER ()"
+
+exports.Partition = class Partition
+  constructor: (@exps) -> null
+  toString: ->
+    "PARTITION BY #{@exps.join(", ")}"
+
+exports.Frame = class Frame
+  constructor: (@frameOp, @lower, @upper) -> null
+  toString: ->
+    if @upper
+      "#{@frameOp} BETWEEN #{@lower} AND #{@upper}"
+    else
+      "#{@frameOp} #{@lower}"
+
+exports.FrameBound = class FrameBound
+  constructor: (@value, @direction) -> null
+  toString: ->
+    if @direction
+      "#{@value} #{@direction}"
+    else
+      "#{@value}"
 
 exports.SubSelect = class SubSelect
   constructor: (@select, @name=null) -> null
@@ -33,7 +136,10 @@ exports.Join = class Join
     ret = ''
     ret += "#{@side} " if @side?
     ret += "#{@mode} " if @mode?
-    ret + "JOIN #{@right}\n" + indent("ON #{@conditions}")
+    if @conditions instanceof Using
+      ret + "JOIN #{@right}\n" + indent("#{@conditions}")
+    else
+      ret + "JOIN #{@right}\n" + indent("ON #{@conditions}")
 
 exports.Union = class Union
   constructor: (@query, @all=false) -> null
@@ -72,12 +178,10 @@ exports.ParameterValue = class ParameterValue
   toString: -> "#{@value}"
 
 exports.ArgumentListValue = class ArgumentListValue
-  constructor: (@value, @distinct=false) -> null
+  constructor: (@value, @qualifier) -> null
   toString: ->
-    if @distinct
-      "DISTINCT #{@value.join(', ')}"
-    else
-      "#{@value.join(', ')}"
+      q = if @qualifier then @qualifier + ' ' else ''
+      "#{q}#{@value.join(', ')}"
 
 exports.BooleanValue = class LiteralValue
   constructor: (value) ->
