@@ -52,9 +52,7 @@ class Lexer
         return
 
   token: (name, value) ->
-    # @tokens.push({name: name, value: value, line: @currentLine, col: @currentColumn})
-    # console.log(name, value)
-    @tokens.push([name, value, @currentLine])
+    @tokens.push([name, value, @currentLine, @currentColumn])
 
   tokenizeFromRegex: (name, regex, part=0, lengthPart=part, output=true) ->
     return 0 unless match = regex.exec(@chunk)
